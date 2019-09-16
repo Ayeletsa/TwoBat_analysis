@@ -8,7 +8,7 @@ data_dir_info=dir(cells_struct_dir);
 %% for each cell
 day_before=0;
 
-for ii_cell = 3:length(data_dir_info)
+for ii_cell =3:length(data_dir_info)
 
     
     ii_cell

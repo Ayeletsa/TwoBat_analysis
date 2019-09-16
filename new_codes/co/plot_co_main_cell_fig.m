@@ -4,7 +4,7 @@ load(dir_param_file_name)
 
 %% structs' parameters
 
-files = dir(behave_cell_struct_folder);
+files = dir(cell_co_solo_initial_analysis_struct_folder);
 behavior_struct_names = {files.name};
 files = dir(co_shuffle_folder_name);
 co_shuffle_struct_names = {files.name};                             
@@ -31,14 +31,14 @@ fsize = 14;
 
 %% plot for each cell
 
-for ii_cell = 3:length(behavior_struct_names)
+for ii_cell = 3:length(cell_co_solo_initial_analysis_struct_folder)
     
     %% load data
     
     struct_name =behavior_struct_names{ii_cell};
-    file_name = fullfile(behave_cell_struct_folder,struct_name);
-    behavior_struct=load(file_name);
-    behavior_struct=behavior_struct.behavior_struct;
+    file_name = fullfile(cell_co_solo_initial_analysis_struct_folder,struct_name);
+    load(file_name);
+    behavior_struct=cell_co_solo_initial_analysis;
     bat=behavior_struct.exp_data.bat;
     day=behavior_struct.exp_data.day;
     cell_num=behavior_struct.exp_data.cell_num;

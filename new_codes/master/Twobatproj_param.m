@@ -15,7 +15,11 @@ params.dirs.behave_analysis_fig_dir_out=[main_analysis_dir,'figures\initial_beha
 params.dirs.co_fig_folder_name=[main_analysis_dir,'figures\basic_co_analysis'];
 
 %save
-dir_params=params.dirs;
+
+ if ~exist(param_folder)
+      mkdir(param_folder);
+ end
+dir_params= params.dirs; 
 param_file_name=fullfile(param_folder,'dirs_params.mat');
 save(param_file_name, '-struct', 'dir_params')
 

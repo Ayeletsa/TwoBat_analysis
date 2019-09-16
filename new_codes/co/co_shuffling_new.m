@@ -10,9 +10,9 @@ for ii_cell = 3:length(behavior_struct_names)
     
     % load cell's egocentric struct
     struct_name = behavior_struct_names{ii_cell};
-    file_name = fullfile(behavior_structs_folder,struct_name);
-    behavior_struct=load(file_name);
-    behavior_struct=behavior_struct.behavior_struct;
+    file_name = fullfile(cell_co_solo_initial_analysis_struct_folder,struct_name);
+    load(file_name);
+    behavior_struct=cell_co_solo_initial_analysis;
     
     % save basic information about the cell
     shuffling_struct(1).info.bat = behavior_struct.exp_data.bat;
