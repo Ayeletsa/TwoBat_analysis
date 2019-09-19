@@ -13,6 +13,7 @@ params.dirs.co_shuffle_folder_name = [main_analysis_dir,'\analysis_structs\co_sh
 % figures:
 params.dirs.behave_analysis_fig_dir_out=[main_analysis_dir,'figures\initial_behavior_analysis\'];
 params.dirs.co_fig_folder_name=[main_analysis_dir,'figures\basic_co_analysis'];
+params.dirs.co_signif_cells_fig_folder_name=[params.dirs.co_fig_folder_name,'signif_cells\'];
 
 %save
 
@@ -61,7 +62,7 @@ params.behav.UT_window=params.behav.frame_per_second;
 params.behav.UT_time_from_CO=2*params.behav.frame_per_second;% 1sec
 params.behav.UT_distance_from_CO=10; %m
 params.behav.bins_to_remove_from_edge_CO_hist=1;
-params.behav.manual_min_dis_from_CO=100; %for manual correction check that the CO is close
+params.behav.manual_min_dis_from_CO=300; %for manual correction check that the CO is close
 params.behav.frame_per_second=100;
 
 
@@ -226,4 +227,19 @@ params.co_shuffle.cell_co_solo_initial_analysis_struct_folder = params.dirs.cell
 co_shuffle_params=params.co_shuffle;
 param_file_name=fullfile(param_folder,'co_shuffle_params.mat');
 save(param_file_name, '-struct', 'co_shuffle_params')
+
+
+%% CO population params:
+
+params.co_population.min_spikes = 30;
+params.co_population.min_ego_inf = 0.1;
+params.co_population.min_even_odd = 0.2;
+params.co_population.alpha = .05;
+params.co_population.interneuron_firing_rate = 10;
+params.co_population.max_for_pyramidal=5;
+%save
+co_population_params=params.co_population;
+param_file_name=fullfile(param_folder,'co_population_params.mat');
+save(param_file_name, '-struct', 'co_population_params')
+
 
