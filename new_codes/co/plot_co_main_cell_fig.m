@@ -1,13 +1,13 @@
-function plot_co_main_cell_fig(dir_param_file_name)
+function plot_co_main_cell_fig(dir_param_file_name,population_param_file_name)
 % plot imporatnat statistics for cross-overs analysis
 load(dir_param_file_name)
-
+load(population_param_file_name)
 %% structs' parameters
 
 files = dir(cell_co_solo_initial_analysis_struct_folder);
 behavior_struct_names = {files.name};
 files = dir(co_shuffle_folder_name);
-co_shuffle_struct_names = {files.name};                             
+co_shuffle_struct_names = {files.name};
 
 
 %% figure parameters
@@ -31,8 +31,8 @@ fsize = 14;
 
 %% plot for each cell
 
-for ii_cell = 3:length(cell_co_solo_initial_analysis_struct_folder)
-    
+for ii_cell = 3:length(behavior_struct_names)
+    signif=0;
     %% load data
     
     struct_name =behavior_struct_names{ii_cell};
@@ -135,7 +135,24 @@ for ii_cell = 3:length(cell_co_solo_initial_analysis_struct_folder)
                 co_ax{16} = axes('units','normalized','Position',[0.32+dir_adj 0.05 0.09 0.12]); % allo information
                 
                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                % info
+                %% check if dir is signif
+                n_spikes = behavior_struct.co(ii_dir).info.n_spikes;
+                even_odd_coherence = co_shuffle_struct(ii_dir).odd_even_coherence.corr;
+                ego_inf = co_shuffle_struct(ii_dir).shuffled_data.params.information_per_spike_ego.values(1);
+                ego_inf_p = co_shuffle_struct(ii_dir).shuffled_data.params.information_per_spike_ego.p_value;
+                cv_p=co_shuffle_struct(ii_dir).shuffled_data.params.cv.p_value;
+                
+                % conditions :
+                a = n_spikes > min_spikes;
+                b = even_odd_coherence > min_even_odd;
+                c = ego_inf > min_ego_inf;
+                d = ego_inf_p < alpha;
+                e=behavior_struct.exp_data.mean_fr<max_for_pyramidal;
+                if min([a,b,c,d,e]) == 1
+                    signif=1;
+                end
+                
+                %% info
                 axes(co_ax{10})
                 title(sprintf('# spikes: %d\n# CO: %d',behavior_struct.co(ii_dir).info.n_spikes,behavior_struct.co(ii_dir).info.n_co))
                 box off
@@ -434,12 +451,12 @@ for ii_cell = 3:length(cell_co_solo_initial_analysis_struct_folder)
                             r=behavior_struct.co(ii_dir).firing_rate.dis_x_fr_per_field{1, fr_i};
                             plot(bins_center,shuf_data,'color',spike_colors{3},'LineWidth',lwidth); hold on;
                             plot(bins_center ,r,'color',spike_colors{ii_dir},'LineWidth',lwidth);
-                           
+                            
                             if behavior_struct.co(ii_dir).firing_rate.signif_field{1, fr_i}.signif_based_on_extreme_bins==1
-                               neg_signif=behavior_struct.co(ii_dir).firing_rate.signif_field{1, fr_i}.neg_signif; 
-                               plot(bins_center(neg_signif),r(neg_signif)+1,'r*')
-                               pos_signif=behavior_struct.co(ii_dir).firing_rate.signif_field{1, fr_i}.pos_signif; 
-                               plot(bins_center(pos_signif),r(pos_signif)+1,'g*')
+                                neg_signif=behavior_struct.co(ii_dir).firing_rate.signif_field{1, fr_i}.neg_signif;
+                                plot(bins_center(neg_signif),r(neg_signif)+1,'r*')
+                                pos_signif=behavior_struct.co(ii_dir).firing_rate.signif_field{1, fr_i}.pos_signif;
+                                plot(bins_center(pos_signif),r(pos_signif)+1,'g*')
                             end
                             max_y = round(max(max([r;shuf_data]))*1.1*10) / 10 +1;
                             if max_y < 1
@@ -470,7 +487,7 @@ for ii_cell = 3:length(cell_co_solo_initial_analysis_struct_folder)
                             else
                                 text(x_limits(2),0,sprintf('cv=%.2f',cv))
                             end
-
+                            
                             % str = sprintf('Hz');
                             %ylabel(str,'fontsize',fsize)
                             box off
@@ -555,29 +572,29 @@ for ii_cell = 3:length(cell_co_solo_initial_analysis_struct_folder)
                     str = sprintf('EGO CV = %.3f\n(p = %.4f)\n',param_value,p_value);
                     title(str,'fontsize',10)
                 end
-%                 % allocentric information
-%                 axes(co_ax{16})
-%                 param_name = ('information_per_spike_allo');
-%                 hold on
-%                 counts = co_shuffle_struct(ii_dir).shuffled_data.params.(param_name).histogram{1, 1};
-%                 if max(counts) > 0
-%                     centers = co_shuffle_struct(ii_dir).shuffled_data.params.(param_name).histogram{1, 2};
-%                     param_value = co_shuffle_struct(ii_dir).shuffled_data.params.(param_name).values(1);
-%                     bar(centers,counts,1,'FaceColor',[.8 .8 .8],'EdgeColor','none')
-%                     stairs([centers(1)-(centers(2)-centers(1))/2 centers-(centers(2)-centers(1))/2 centers(length(centers))+(centers(2)-centers(1))/2],[0 counts 0],'LineWidth',1,'color','k')
-%                     line([param_value param_value],[0 max(counts)],'linestyle','--','color',[1 0 1],'linewidth',1.5);
-%                     max_x = max([centers(end),param_value]);
-%                     set(gca,'ylim',[0 max(counts)*1.1],'ytick',max(counts),'yticklabel',round(max(counts)/sum(counts)*100)/100,...
-%                         'xlim',[0,max_x*1.1],'xtick',[0,max_x*1.1],'xticklabel',round([0,max_x*1.1]*10)/10)
-%                 end
-%                 p_value = co_shuffle_struct(ii_dir).shuffled_data.params.(param_name).p_value;
-%                 if p_value < alpha
-%                     set(gca, 'color',sig_bkg_color)
-%                 end
-%                 if ~isnan(p_value)
-%                     str = sprintf('ALLO information = %.3f\n(p = %.4f)\n',param_value,p_value);
-%                     title(str,'fontsize',10)
-%                 end
+                %                 % allocentric information
+                %                 axes(co_ax{16})
+                %                 param_name = ('information_per_spike_allo');
+                %                 hold on
+                %                 counts = co_shuffle_struct(ii_dir).shuffled_data.params.(param_name).histogram{1, 1};
+                %                 if max(counts) > 0
+                %                     centers = co_shuffle_struct(ii_dir).shuffled_data.params.(param_name).histogram{1, 2};
+                %                     param_value = co_shuffle_struct(ii_dir).shuffled_data.params.(param_name).values(1);
+                %                     bar(centers,counts,1,'FaceColor',[.8 .8 .8],'EdgeColor','none')
+                %                     stairs([centers(1)-(centers(2)-centers(1))/2 centers-(centers(2)-centers(1))/2 centers(length(centers))+(centers(2)-centers(1))/2],[0 counts 0],'LineWidth',1,'color','k')
+                %                     line([param_value param_value],[0 max(counts)],'linestyle','--','color',[1 0 1],'linewidth',1.5);
+                %                     max_x = max([centers(end),param_value]);
+                %                     set(gca,'ylim',[0 max(counts)*1.1],'ytick',max(counts),'yticklabel',round(max(counts)/sum(counts)*100)/100,...
+                %                         'xlim',[0,max_x*1.1],'xtick',[0,max_x*1.1],'xticklabel',round([0,max_x*1.1]*10)/10)
+                %                 end
+                %                 p_value = co_shuffle_struct(ii_dir).shuffled_data.params.(param_name).p_value;
+                %                 if p_value < alpha
+                %                     set(gca, 'color',sig_bkg_color)
+                %                 end
+                %                 if ~isnan(p_value)
+                %                     str = sprintf('ALLO information = %.3f\n(p = %.4f)\n',param_value,p_value);
+                %                     title(str,'fontsize',10)
+                %                 end
             end
             
             
@@ -590,10 +607,16 @@ for ii_cell = 3:length(cell_co_solo_initial_analysis_struct_folder)
             end
             fig_name=fullfile(co_fig_folder_name,['cell_',num2str(cell_num),'_day_',num2str(day),'_bat_',num2str(bat),'.png']);
             saveas(gcf,fig_name)
-            clf(gcf)
             
         end
-        %end
+        
+        %% for CO signif cells save also in relevant dir:
+        if signif==1
+            fig_name=fullfile(co_signif_cells_fig_folder_name,['cell_',num2str(cell_num),'_day_',num2str(day),'_bat_',num2str(bat),'.png']);
+            saveas(gcf,fig_name)
+        end
+        clf(gcf)
+        
     else
         continue
     end
