@@ -30,7 +30,6 @@ fsize = 14;
 
 
 %% plot for each cell
-
 for ii_cell = 3:length(behavior_struct_names)
     signif=0;
     %% load data

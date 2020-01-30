@@ -5,7 +5,6 @@ load(co_shuffle_param_file_name)
 files = dir(cell_co_solo_initial_analysis_struct_folder);
 behavior_struct_names = {files.name};
 %% for each cell
-
 for ii_cell = 3:length(behavior_struct_names)
     
     % load cell's egocentric struct

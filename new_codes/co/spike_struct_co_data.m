@@ -265,8 +265,9 @@ for ii_dir = 1:2
         firing_rate.dis_bin_size{bin_dis_i,bin_allo_i}=dis_X_bin_size_2D(bin_dis_i);
         firing_rate.allo_X_bins_vector{bin_dis_i,bin_allo_i}=allo_X_min:allo_X_bin_size_2D(bin_allo_i):allo_X_max;
         firing_rate.allo_X_bins_vector_of_centers{bin_dis_i,bin_allo_i}=firing_rate.allo_X_bins_vector{bin_dis_i,bin_allo_i}(1:end-1)+allo_X_bin_size_2D(bin_allo_i)/2;
-        firing_rate.dis_X_bins_vector{bin_dis_i,bin_allo_i}=dis_X_min:dis_X_bin_size_2D(bin_dis_i):dis_X_max;
-        firing_rate.dis_X_bins_vector_of_centers{bin_dis_i,bin_allo_i}=firing_rate.dis_X_bins_vector{bin_dis_i,bin_allo_i}(1:end-1)+dis_X_bin_size_2D(bin_dis_i)/2;
+        firing_rate.dis_X_bins_vector{bin_dis_i,bin_allo_i}=linspace(dis_X_min,dis_X_max,27);
+        dis_X_bin_size_2D=min(diff(firing_rate.dis_X_bins_vector{bin_dis_i,bin_allo_i}));
+        firing_rate.dis_X_bins_vector_of_centers{bin_dis_i,bin_allo_i}=firing_rate.dis_X_bins_vector{bin_dis_i,bin_allo_i}(1:end-1)+dis_X_bin_size_2D/2;
         
         %data:
         bsp_vec_allo = bsp.x_pos(isfinite(bsp.x_pos));

@@ -32,6 +32,7 @@ for dir_i=1:length(dirs)
   end
 end
 %% parameters for find_flight_ind
+tunnel_limit=[0 130];
 params.behav.min_velocity_flight=2; % define flight by velocity (m/sec)
 params.behav.dist_from_the_ball=3;
 params.behav.min_time_for_slow_flights=1*100;
@@ -55,7 +56,7 @@ params.behav.min_tracking_length=3*params.behav.frame_per_second; %samples
 params.behav.dist_thresh_tracking=20; %meters
 params.behav.dist_thresh_solo=25; %meters
 params.behav.dist_thresh_CO=5; %meters
-params.behav.CO_window=[20 20]; %meters
+params.behav.CO_window=[20 20]; %meters %CHECK WHY I NEED IT
 params.behav.max_wind_CO=2*params.behav.frame_per_second;
 params.behav.min_time_before_CO=2*params.behav.frame_per_second;
 params.behav.UT_window=params.behav.frame_per_second;
@@ -63,7 +64,6 @@ params.behav.UT_time_from_CO=2*params.behav.frame_per_second;% 1sec
 params.behav.UT_distance_from_CO=10; %m
 params.behav.bins_to_remove_from_edge_CO_hist=1;
 params.behav.manual_min_dis_from_CO=300; %for manual correction check that the CO is close
-params.behav.frame_per_second=100;
 
 
 %save
@@ -74,14 +74,14 @@ save(param_file_name, '-struct', 'behav_params')
 %% parameters for solo analysis
 %parameters for Tuning curve calculation
 
-params.solo.solo_X_min= 0;
-params.solo.solo_X_max= 130;
+params.solo.solo_X_min= tunnel_limit(1);
+params.solo.solo_X_max= tunnel_limit(2);
 params.solo.solo_X_n_bins = params.solo.solo_X_max * 2;
 params.solo.solo_X_bin_size = (params.solo.solo_X_max-params.solo.solo_X_min)/params.solo.solo_X_n_bins;
 params.solo.solo_X_bins_vector=params.solo.solo_X_min:params.solo.solo_X_bin_size:params.solo.solo_X_max;
 params.solo.solo_X_bins_vector_of_centers=params.solo.solo_X_bins_vector(1:end-1)+params.solo.solo_X_bin_size/2;
 params.solo.solo_time_spent_minimum_for_1D_bins=0.1;
-params.solo.frames_per_second=100;
+params.solo.frames_per_second=params.behav.frame_per_second;
 %
 % field_detection_bin_size = 0.5; %m
 % field_detection_X_bins_vector=solo_X_min:field_detection_bin_size:solo_X_max;
@@ -112,6 +112,15 @@ params.solo.bin_edges=params.solo.field_detection_X_bins_vector;
 params.solo.ref_height_for_width=0.2;
 params.solo.ref_height_for_overlap=0.5;
 
+params.solo.vel_min= 0;
+params.solo.vel_max= 14;
+params.solo.vel_n_bins = params.solo.vel_max * 2;
+params.solo.vel_bin_size = (params.solo.vel_max-params.solo.vel_min)/params.solo.vel_n_bins;
+params.solo.vel_bins_vector=params.solo.vel_min:params.solo.vel_bin_size:params.solo.vel_max;
+params.solo.vel_bins_vector_of_centers=params.solo.vel_bins_vector(1:end-1)+params.solo.vel_bin_size/2;
+params.solo.vel_time_spent_minimum_for_1D_bins=1;
+
+
 %save
 solo_params=params.solo;
 param_file_name=fullfile(param_folder,'solo_params.mat');
@@ -121,7 +130,7 @@ save(param_file_name, '-struct', 'solo_params')
 %% parameters for CO analysis basic analysis
 params.co.time_spent_minimum_for_1D_bins=0.2;
 params.co.time_spent_minimum_for_1D_bins_per_field=0.1;
-params.co.frames_per_second=100;
+params.co.frames_per_second=params.behav.frame_per_second;
 params.co.num_shuffles_per_field=1000;
 params.co.alpha_val=5;
 params.co.manual_min_dis_from_CO=100; %for manual correction check that the CO is close
@@ -144,8 +153,8 @@ params.co.dis_X_bins_vector=params.co.dis_X_min:params.co.dis_X_bin_size:params.
 params.co.dis_X_bins_vector_of_centers=params.co.dis_X_bins_vector(1:end-1)+params.co.dis_X_bin_size/2;
 
 %c. allocentric during CO
-params.co.allo_X_min= 0;
-params.co.allo_X_max= 130;
+params.co.allo_X_min= tunnel_limit(1);
+params.co.allo_X_max= tunnel_limit(2);
 params.co.allo_X_n_bins = params.co.allo_X_max * 2;
 params.co.allo_X_bin_size = (params.co.allo_X_max-params.co.allo_X_min)/params.co.allo_X_n_bins;
 params.co.allo_X_bins_vector=params.co.allo_X_min:params.co.allo_X_bin_size:params.co.allo_X_max;

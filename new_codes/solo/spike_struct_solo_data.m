@@ -1,7 +1,7 @@
 function  solo = spike_struct_solo_data (bsp_proc_data,cell_struct,behavioral_modes,tag_i,solo_param_file_name)
 
 load(solo_param_file_name)
-
+us_factor=1e6;
 %% loop for 2 directions
 
 solo_ind = behavioral_modes.solo_ind;
@@ -15,11 +15,14 @@ for ii_dir = 1:2
     bsp_during_solo_x_pos = bsp_proc_data(tag_i).pos(intersect(solo_ind,dir_ind),1);
     bsp_during_solo_y_pos = bsp_proc_data(tag_i).pos(intersect(solo_ind,dir_ind),2);
     
+    xy=[bsp_during_solo_x_pos,bsp_during_solo_y_pos];
+    vel_xy=abs((sqrt(nansum(diff([0 0;xy  ]).^2,2))./diff([0;bsp_during_solo_ts_usec])).*us_factor);
     %find spikes parameters
     epochs=intersect(solo_ind,dir_ind);
     spikes_during_solo_ts_usec = find_spikes_in_epochs (epochs,cell_struct);
     spikes_during_solo_x_pos = interp1(bsp_proc_data(tag_i).ts ,bsp_proc_data(tag_i).pos(:,1),spikes_during_solo_ts_usec);
     spikes_during_solo_y_pos = interp1(bsp_proc_data(tag_i).ts ,bsp_proc_data(tag_i).pos(:,2),spikes_during_solo_ts_usec);
+    spikes_during_solo_vel= interp1(bsp_during_solo_ts_usec ,vel_xy,spikes_during_solo_ts_usec);
     
     % create a matrix from the data, such as each row is one flight
     new_flight_dis_criteria = dis_criteria(ii_dir);
@@ -87,11 +90,17 @@ for ii_dir = 1:2
     % calculate tuning curve
     not_nan_bsp_x_pos = bsp_x_pos_mat(isfinite(bsp_x_pos_mat));
     not_nan_spikes_x_pos = spikes_x_pos_mat(isfinite(spikes_x_pos_mat));
-    
+     
     [~, ~, ~, solo_x_pos_firing_rate, ~,~] ...
         = fn_compute_generic_1D_tuning_new_smooth ...
         (not_nan_bsp_x_pos, not_nan_spikes_x_pos, solo_X_bins_vector_of_centers, solo_time_spent_minimum_for_1D_bins, frames_per_second, 0,0,0);
+   
+    [~, ~, ~, vel_firing_rate, ~,~] ...
+        = fn_compute_generic_1D_tuning_new_smooth ...
+        (vel_xy, spikes_during_solo_vel, vel_bins_vector_of_centers, vel_time_spent_minimum_for_1D_bins, frames_per_second, 0,0,0);
     
+    %calculate velocity curve
+     
     %% Field detection
     if ~isempty(not_nan_spikes_x_pos)
         data=[bsp_x_pos';bsp_ts_usec';spikes_x_pos';spikes_ts_usec'];
@@ -121,6 +130,7 @@ for ii_dir = 1:2
     solo(ii_dir).field_height=field_height;
     solo(ii_dir).field_edges=field_edges;
     solo(ii_dir).PSTH_for_field_detection=PSTH;
+    solo(ii_dir).vel_firing_rate=vel_firing_rate;
 end
 
 end
